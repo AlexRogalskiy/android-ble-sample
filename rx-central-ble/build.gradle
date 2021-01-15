@@ -1,0 +1,50 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion deps.build.compileSdkVersion
+    buildToolsVersion deps.build.buildToolsVersion
+    testOptions.unitTests.includeAndroidResources = true
+
+    defaultConfig {
+        minSdkVersion deps.build.minSdkVersion
+        targetSdkVersion deps.build.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+    }
+    compileOptions {
+        sourceCompatibility deps.build.javaVersion
+        targetCompatibility deps.build.javaVersion
+    }
+
+    lintOptions {
+        abortOnError true
+        lintConfig rootProject.file('config/lint/lint.xml')
+    }
+}
+
+task checkstyle(type: Checkstyle) {
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+
+    classpath = files()
+}
+
+check.dependsOn 'checkstyle'
+
+dependencies {
+    implementation deps.support.appcompat
+    implementation deps.support.v4
+    implementation deps.support.annotations
+    implementation deps.misc.timber
+
+    api deps.rx.java
+    api deps.rx.android
+    api 'com.jakewharton.rxrelay2:rxrelay:2.1.1'
+
+    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'org.robolectric:robolectric:4.4'
+    testImplementation deps.test.powermock
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
